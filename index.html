@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Activity Tracker</title>
+
+  <!-- Mobile & SEO -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Monthly habit tracker with progress, streaks, and analytics" />
+
+  <!-- Font (optional but recommended) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<header>
+  <h1>Activity Tracker</h1>
+
+  <div class="month-select">
+    <select aria-label="Select Month" onchange="changeMonth(this.value)">
+      <option value="JANUARY">January</option>
+      <option value="FEBRUARY">February</option>
+      <option value="MARCH">March</option>
+      <option value="APRIL">April</option>
+      <option value="MAY">May</option>
+      <option value="JUNE">June</option>
+      <option value="JULY">July</option>
+      <option value="AUGUST">August</option>
+      <option value="SEPTEMBER">September</option>
+      <option value="OCTOBER">October</option>
+      <option value="NOVEMBER">November</option>
+      <option value="DECEMBER">December</option>
+    </select>
+  </div>
+  
+</header>
+
+<main>
+  <!-- TABLE -->
+   <div style="padding: 0 24px 12px; display: flex; justify-content: flex-end;">
+  <button id="add-habit-btn">+ Add Habit</button>
+</div>
+
+  <div id="table-container" aria-live="polite"></div>
+
+  <!-- MONTHLY PROGRESS GRAPH -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span>Monthly Progress</span>
+      <span id="progress-text">0%</span>
+    </div>
+
+    <div class="chart-section">
+      <div id="chart-loading">Loading chart…</div>
+      <canvas id="progressChart"></canvas>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Habit Tracker • Progress, streaks & counts calculated automatically
+</footer>
+
+<!-- Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js" defer></script>
+
+</body>
+</html>
