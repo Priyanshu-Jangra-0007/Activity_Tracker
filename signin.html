@@ -25,7 +25,7 @@
             <form id="signupForm">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" required placeholder="John Doe">
+                    <input type="text" required placeholder="Your Name">
                 </div>
 
                 <div class="form-group">
@@ -45,12 +45,51 @@
 
 
 
-                <div class="checkbox-group">
-                    <input type="checkbox" required>
-                    <label>
-                        I agree to the <a href="#" class="link">Terms & Conditions</a>
-                    </label>
-                </div>
+<div class="checkbox-group">
+  <input type="checkbox" id="tcCheckbox" required>
+  <label for="tcCheckbox">
+    I agree to the
+    <a href="#" id="openTcModal" class="tc-link">Terms & Conditions</a>
+  </label>
+</div>
+
+<!-- Terms & Conditions Modal -->
+<div id="tcModal" class="tc-modal" aria-hidden="true">
+  <div class="tc-modal-content">
+
+    <div class="tc-modal-header">
+      <h2>Terms & Conditions</h2>
+      <button type="button" id="closeTcModal" class="tc-close-btn">
+        &times;
+      </button>
+    </div>
+
+    <div class="tc-modal-body">
+      <p>
+        By using this service, you agree to comply with and be bound by the following terms and conditions.
+        Please review them carefully before proceeding.
+      </p>
+
+      <p>
+        These terms govern your access to and use of the platform, including any content, functionality,
+        and services offered. If you do not agree to these terms, you should not use this service.
+      </p>
+
+      <p>
+        Additional terms, policies, or guidelines may apply depending on your use of specific features.
+      </p>
+    </div>
+
+    <div class="tc-modal-footer">
+      <button type="button" id="acceptTcBtn" class="tc-primary-btn">
+        Close
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
 
                 <button type="submit" class="btn">Create Account</button>
                 <button
@@ -117,6 +156,33 @@
     }
   };
 </script>
+<script>
+  const tcModal = document.getElementById("tcModal");
+  const openTcModal = document.getElementById("openTcModal");
+  const closeTcModal = document.getElementById("closeTcModal");
+  const acceptTcBtn = document.getElementById("acceptTcBtn");
+
+  openTcModal.addEventListener("click", (e) => {
+    e.preventDefault();
+    tcModal.style.display = "block";
+    tcModal.setAttribute("aria-hidden", "false");
+  });
+
+  function closeTc() {
+    tcModal.style.display = "none";
+    tcModal.setAttribute("aria-hidden", "true");
+  }
+
+  closeTcModal.addEventListener("click", closeTc);
+  acceptTcBtn.addEventListener("click", closeTc);
+
+  window.addEventListener("click", (e) => {
+    if (e.target === tcModal) {
+      closeTc();
+    }
+  });
+</script>
+
 
 </body>
 </html>

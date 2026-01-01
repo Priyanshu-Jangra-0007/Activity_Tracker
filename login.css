@@ -265,3 +265,200 @@ body::before {
         transform: translate(-50%, -50%) rotate(360deg);
     }
 }
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    max-width: 500px;
+    margin: 10% auto;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.modal-header,
+.modal-footer {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.modal-footer {
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.primary-btn {
+    padding: 8px 16px;
+    cursor: pointer;
+}
+/* Overlay */
+.tc-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 20, 15, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+}
+
+/* Modal Box */
+.tc-modal-content {
+  background: rgba(20, 60, 48, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(120, 220, 190, 0.25);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+  border-radius: 16px;
+  max-width: 520px;
+  margin: 8% auto;
+  overflow: hidden;
+  color: #eafaf3;
+}
+
+/* Header */
+.tc-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(120, 220, 190, 0.15);
+}
+
+.tc-modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #6fffd2;
+}
+
+/* Close Button */
+.tc-close-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #eafaf3;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.tc-close-btn:hover {
+  opacity: 0.75;
+}
+
+/* Body */
+.tc-modal-body {
+  padding: 18px 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(234, 250, 243, 0.9);
+}
+
+.tc-modal-body p {
+  margin-bottom: 14px;
+}
+
+/* Footer */
+.tc-modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid rgba(120, 220, 190, 0.15);
+  text-align: right;
+}
+
+/* Primary Button */
+.tc-primary-btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #20c997;
+  color: #0f2f26;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tc-primary-btn:hover {
+  background: #34e0b5;
+}
+
+/* Link next to checkbox */
+.tc-link {
+  color: #6fffd2;
+  text-decoration: none;
+}
+
+.tc-link:hover {
+  text-decoration: underline;
+}
+/* ---------- Animation Keyframes ---------- */
+
+@keyframes tcFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tcSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ---------- Animated Overlay ---------- */
+
+.tc-modal {
+  animation: tcFadeIn 0.25s ease-out forwards;
+}
+
+/* ---------- Animated Modal ---------- */
+
+.tc-modal-content {
+  animation: tcSlideUp 0.3s ease-out forwards;
+}
+
+/* ---------- Optional: smoother close ---------- */
+
+.tc-modal[aria-hidden="true"] {
+  animation: none;
+  opacity: 0;
+}
+/* Chrome / Edge / Safari Autofill Fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #eafaf3;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(20, 60, 48, 0.85) inset;
+  transition: background-color 9999s ease-in-out 0s;
+  caret-color: #eafaf3;
+}
