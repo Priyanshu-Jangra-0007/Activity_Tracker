@@ -19,7 +19,23 @@
 
 <header>
   <h1>Activity Tracker</h1>
+  <div class="profile-wrapper">
+    <div id="profileBtn" class="profile-btn">
+  <img id="profileAvatar" class="profile-avatar" />
+  <span id="profileName">User</span>
+  <span class="caret">▾</span>
+</div>
 
+
+    <div id="profileDropdown" class="profile-dropdown">
+  <button class="dropdown-btn" id="editNameBtn">Edit Name</button>
+
+  <a href="profile.html" class="dropdown-btn">Profile</a>
+
+  <button class="dropdown-btn danger" id="logoutBtn">Logout</button>
+</div>
+
+  </div>
   <div class="month-select">
     <select aria-label="Select Month" onchange="changeMonth(this.value)">
       <option value="JANUARY">January</option>
@@ -66,8 +82,44 @@
 </footer>
 
 <!-- Script -->
+<!-- Firebase Auth Guard -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCuk1-E7-RfE7coqA9hh4rAFpTNIlyTbV8",
+    authDomain: "activity-tracker-web-dc8bb.firebaseapp.com",
+    projectId: "activity-tracker-web-dc8bb",
+    storageBucket: "activity-tracker-web-dc8bb.firebasestorage.app",
+    messagingSenderId: "243753651024",
+    appId: "1:243753651024:web:3030467037a6c830b63a55"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 🔐 Route protection
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.replace("login.html");
+    }
+  });
+
+  // 🔓 Logout (call manually from button if needed)
+  window.logout = async function () {
+    await signOut(auth);
+    window.location.replace("login.html");
+  };
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="script.js" defer></script>
+<script src="script.js" type="module" defer></script>
+
 
 </body>
 </html>

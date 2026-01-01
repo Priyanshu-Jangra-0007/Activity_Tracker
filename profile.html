@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Main app styles (optional) -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Profile-specific styles -->
+  <link rel="stylesheet" href="profile.css" />
+</head>
+
+<body>
+
+    <div class="profile-page">
+
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    ← Back
+  </button>
+
+  <h2>Profile</h2>
+
+  <img id="avatar" class="profile-avatar" />
+
+  <div class="profile-row">
+    <strong>Name:</strong>
+    <span id="name">—</span>
+  </div>
+
+  <div class="profile-row">
+    <strong>Email:</strong>
+    <span id="email">—</span>
+  </div>
+
+  <div class="profile-actions">
+    <button id="editName">Edit Name</button>
+    <button id="logout" class="danger">Logout</button>
+  </div>
+
+</div>
+
+  <!-- ================= FIREBASE LOGIC ================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      updateProfile,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuk1-E7-RfE7coqA9hh4rAFpTNIlyTbV8",
+      authDomain: "activity-tracker-web-dc8bb.firebaseapp.com",
+      projectId: "activity-tracker-web-dc8bb",
+      storageBucket: "activity-tracker-web-dc8bb.firebasestorage.app",
+      messagingSenderId: "243753651024",
+      appId: "1:243753651024:web:3030467037a6c830b63a55"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const nameEl = document.getElementById("name");
+    const emailEl = document.getElementById("email");
+    const avatarEl = document.getElementById("avatar");
+
+    // 🔐 Protect page + load user
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      nameEl.textContent = user.displayName || user.email.split("@")[0];
+      emailEl.textContent = user.email;
+
+      avatarEl.src =
+        user.photoURL ||
+        "https://ui-avatars.com/api/?name=" +
+          encodeURIComponent(nameEl.textContent);
+    });
+
+    // ✏️ Edit display name
+    document.getElementById("editName").addEventListener("click", async () => {
+      const newName = prompt("Enter your name:");
+      if (!newName || !newName.trim()) return;
+
+      try {
+        await updateProfile(auth.currentUser, {
+          displayName: newName.trim()
+        });
+
+        nameEl.textContent = newName.trim();
+      } catch {
+        alert("Failed to update name");
+      }
+    });
+
+    // 🚪 Logout
+    document.getElementById("logout").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+  </script>
+
+</body>
+</html>

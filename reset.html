@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Tracker - Reset Password</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="left: 15%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 35%; animation-delay: 1.5s;"></div>
+    <div class="particle" style="left: 55%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 75%; animation-delay: 4.5s;"></div>
+
+    <div class="container">
+        <div class="card">
+            <div class="logo-container">
+                <div class="logo">🎯</div>
+            </div>
+
+            <h1 class="title">Reset Password</h1>
+            <p class="subtitle">We’ll send you a reset link</p>
+
+            <form id="resetForm">
+                <div class="form-group">
+                    <label for="resetEmail">Email</label>
+                    <input
+                        type="email"
+                        id="resetEmail"
+                        placeholder="your.email@example.com"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn">Send Reset Link</button>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="window.location.href='login.html'">
+                    Back to Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getAuth,
+    sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  // ================= FIREBASE INIT =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCuk1-E7-RfE7coqA9hh4rAFpTNIlyTbV8",
+    authDomain: "activity-tracker-web-dc8bb.firebaseapp.com",
+    projectId: "activity-tracker-web-dc8bb",
+    storageBucket: "activity-tracker-web-dc8bb.firebasestorage.app",
+    messagingSenderId: "243753651024",
+    appId: "1:243753651024:web:3030467037a6c830b63a55"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // ================= RESET LOGIC =================
+  const form = document.querySelector("form");
+  const emailInput = form.querySelector("input[type='email']");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = emailInput.value.trim();
+    if (!email) return;
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Password reset link sent. Check your email.");
+    } catch (err) {
+      if (err.code === "auth/user-not-found") {
+        alert("No account found with this email.");
+      } else if (err.code === "auth/invalid-email") {
+        alert("Please enter a valid email address.");
+      } else if (err.code === "auth/too-many-requests") {
+        alert("Too many attempts. Try again later.");
+      } else {
+        alert(err.message);
+      }
+    }
+  });
+</script>
+
+
+</body>
+</html>

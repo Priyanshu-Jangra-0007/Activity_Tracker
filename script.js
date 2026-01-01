@@ -1,3 +1,177 @@
+// ================= FIREBASE IMPORTS =================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { updateProfile } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const editNameBtn = document.getElementById("editNameBtn");
+
+editNameBtn?.addEventListener("click", async () => {
+  const newName = prompt("Enter your name:");
+  if (!newName || !newName.trim()) return;
+
+  try {
+    await updateProfile(auth.currentUser, {
+      displayName: newName.trim()
+    });
+
+    document.getElementById("profileName").textContent = newName.trim();
+    dropdown.classList.remove("open");
+  } catch {
+    alert("Failed to update name");
+  }
+});
+
+// ================= FIREBASE INIT =================
+const firebaseConfig = {
+  apiKey: "AIzaSyCuk1-E7-RfE7coqA9hh4rAFpTNIlyTbV8",
+  authDomain: "activity-tracker-web-dc8bb.firebaseapp.com",
+  projectId: "activity-tracker-web-dc8bb",
+  storageBucket: "activity-tracker-web-dc8bb.firebasestorage.app",
+  messagingSenderId: "243753651024",
+  appId: "1:243753651024:web:3030467037a6c830b63a55"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ================= AUTH STATE =================
+let currentUser = null;
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const nameEl = document.getElementById("profileName");
+  const avatarEl = document.getElementById("profileAvatar");
+
+  if (nameEl) {
+    nameEl.textContent =
+      user.displayName || user.email.split("@")[0];
+  }
+
+  if (avatarEl) {
+    avatarEl.src =
+      user.photoURL ||
+      "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(nameEl.textContent);
+  }
+
+  loadHabits();
+});
+
+const profileBtn = document.getElementById("profileBtn");
+const dropdown = document.getElementById("profileDropdown");
+
+profileBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  dropdown.style.display =
+    dropdown.style.display === "block" ? "none" : "block";
+});
+
+document.addEventListener("click", () => {
+  if (dropdown) dropdown.style.display = "none";
+});
+profileBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  dropdown.classList.toggle("open");
+});
+
+document.addEventListener("click", () => {
+  dropdown?.classList.remove("open");
+});
+
+// ================= LOGOUT =================
+const logoutBtn = document.getElementById("logoutBtn");
+
+logoutBtn?.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    window.location.href = "login.html";
+  } catch {
+    alert("Failed to log out. Please try again.");
+  }
+});
+
+// ================= CREATE HABIT =================
+async function createHabit(title) {
+  if (!currentUser) return;
+
+  await addDoc(collection(db, "habits"), {
+    userId: currentUser.uid,
+    title,
+    frequency: "daily",
+    createdAt: serverTimestamp(),
+    logs: {}
+  });
+}
+// ================= MAP FIRESTORE HABITS → UI =================
+function syncFirestoreHabitsToUI(firestoreHabits) {
+  const habitMeta = loadHabitMeta(MONTH);
+
+  habitMeta.order = habitMeta.order || [];
+  habitMeta.names = habitMeta.names || {};
+  habitMeta.custom = habitMeta.custom || {};
+  habitMeta.deleted = habitMeta.deleted || {};
+
+  firestoreHabits.forEach(habit => {
+    const id = `fs-${habit.id}`; // virtual stable ID
+
+    if (!habitMeta.order.includes(id)) {
+      habitMeta.order.push(id);
+    }
+
+    habitMeta.names[id] = habit.title;
+    habitMeta.custom[id] = true;
+    habitMeta.deleted[id] = false;
+  });
+
+  saveHabitMeta(MONTH, habitMeta);
+}
+
+// ================= LOAD HABITS FROM FIRESTORE =================
+async function loadHabits() {
+  if (!currentUser) return;
+
+  const q = query(
+    collection(db, "habits"),
+    where("userId", "==", currentUser.uid)
+  );
+
+  const snapshot = await getDocs(q);
+
+  const firestoreHabits = [];
+
+  snapshot.forEach((doc) => {
+    firestoreHabits.push({
+      id: doc.id,
+      ...doc.data()
+    });
+  });
+
+  syncFirestoreHabitsToUI(firestoreHabits);
+
+  loadSheet(); // re-render using updated meta
+}
+
+
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwN0UH1eIGNFy2yfxjj5dZT8l9sLVG_XrIYfxyy9lhloFZOOcFCpZo-iFF1ojl_Olru/exec";
 
@@ -239,16 +413,23 @@ if (c === 0) {
   deleteBtn.className = "habit-btn delete-btn";
   deleteBtn.textContent = "Delete";
 
-  deleteBtn.onclick = () => {
-    if (!confirm(`Delete "${nameSpan.textContent}"?`)) return;
+deleteBtn.onclick = async () => {
+  if (!confirm(`Delete "${nameSpan.textContent}"?`)) return;
 
-    const habitMeta = loadHabitMeta(MONTH);
-    habitMeta.deleted = habitMeta.deleted || {};
-    habitMeta.deleted[r] = true;
+  // Firestore-backed habit
+  if (String(r).startsWith("fs-")) {
+    const firestoreId = String(r).replace("fs-", "");
+    await deleteHabitFirestore(firestoreId);
+  }
 
-    saveHabitMeta(MONTH, habitMeta);
-    loadSheet(); // refresh table + graph
-  };
+  // Remove from local meta so UI updates immediately
+  const habitMeta = loadHabitMeta(MONTH);
+  habitMeta.deleted = habitMeta.deleted || {};
+  habitMeta.deleted[r] = true;
+
+  saveHabitMeta(MONTH, habitMeta);
+  loadHabits(); // re-sync from Firestore
+};
 
   wrapper.appendChild(nameSpan);
   wrapper.appendChild(editBtn);
@@ -497,26 +678,20 @@ function getDayColsFromHeader(data) {
   return cols;
 }
 
-document.getElementById("add-habit-btn")?.addEventListener("click", () => {
+document.getElementById("add-habit-btn")?.addEventListener("click", async () => {
   const name = prompt("Enter new habit name:");
   if (!name || !name.trim()) return;
 
-  const habitMeta = loadHabitMeta(MONTH);
-
-  // create a unique virtual habit id (never clashes with sheet rows)
-  const id = -Date.now();
-
-  // store habit name
-  habitMeta.names = habitMeta.names || {};
-  habitMeta.names[id] = name.trim();
-
-  // mark as custom habit
-  habitMeta.custom = habitMeta.custom || {};
-  habitMeta.custom[id] = true;
-
-  // add to order
-  habitMeta.order.push(id);
-
-  saveHabitMeta(MONTH, habitMeta);
-  loadSheet(); // re-render table + graph
+  await createHabit(name.trim());
+  // Firestore → loadHabits() → syncFirestoreHabitsToUI → loadSheet()
 });
+// ================= DELETE HABIT (FIRESTORE) =================
+async function deleteHabitFirestore(firestoreId) {
+  if (!currentUser) return;
+
+  const { deleteDoc, doc } = await import(
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+  );
+
+  await deleteDoc(doc(db, "habits", firestoreId));
+}

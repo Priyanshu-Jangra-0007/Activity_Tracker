@@ -1,0 +1,85 @@
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-page {
+  max-width: 420px;
+  width: 100%;
+  background: rgba(20, 40, 32, 0.9);
+  border-radius: 16px;
+  padding: 28px;
+  color: #eafff4;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 16px 0;
+}
+
+.profile-row {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  justify-content: center;
+}
+.edit-photo-btn {
+  margin: 0 auto 16px;
+}
+.back-btn {
+  align-self: flex-start;
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+
+  background: rgba(234, 255, 244, 0.12);
+  color: #eafff4;
+}
+
+.back-btn:hover {
+  background: rgba(234, 255, 244, 0.2);
+}
+
+
+.profile-actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  background: rgba(234, 255, 244, 0.12);
+  color: #eafff4;
+}
+
+.profile-actions button:hover {
+  background: rgba(234, 255, 244, 0.2);
+}
+
+.profile-actions .danger {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ffb3b3;
+}
+
+.profile-actions .danger:hover {
+  background: rgba(255, 107, 107, 0.35);
+  color: #fff;
+}

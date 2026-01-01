@@ -467,3 +467,108 @@ tr .habit-btn {
 tr:hover .habit-btn {
   opacity: 1;
 }
+.logout-btn {
+  background: transparent;
+  border: 1px solid rgba(234, 255, 244, 0.4);
+  color: #eafff4;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(234, 255, 244, 0.12);
+  border-color: #eafff4;
+}
+.profile-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.profile-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(234, 255, 244, 0.08);
+  color: #eafff4;
+  font-size: 14px;
+}
+
+.profile-btn:hover {
+  background: rgba(234, 255, 244, 0.15);
+}
+
+.caret {
+  font-size: 12px;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  min-width: 180px;
+  background: rgba(18, 30, 26, 0.95);
+  border: 1px solid rgba(234, 255, 244, 0.15);
+  border-radius: 12px;
+  padding: 6px;
+  z-index: 1000;
+
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: all 0.18s ease;
+}
+
+.profile-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 🔘 unified button style */
+.dropdown-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: #eafff4;
+  padding: 10px 12px;
+  font-size: 14px;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+
+  display: block;
+}
+
+.dropdown-btn:hover {
+  background: rgba(234, 255, 244, 0.12);
+}
+
+/* 🚪 logout emphasis */
+.dropdown-btn.danger {
+  color: #ffb3b3;
+}
+
+.dropdown-btn.danger:hover {
+  background: rgba(255, 107, 107, 0.18);
+  color: #fff;
+}
+
+
+.profile-dropdown button:hover {
+  background: rgba(255, 107, 107, 0.15);
+}
+.profile-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(234, 255, 244, 0.2);
+}
