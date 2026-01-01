@@ -78,16 +78,17 @@
 
 <script type="module">
   import { auth } from "./firebase.js";
-  import { signInWithEmailAndPassword }
-  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import {
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+  // ================= EMAIL / PASSWORD LOGIN =================
   const form = document.getElementById("loginForm");
-
-  console.log("Login script loaded");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("Login submitted");
 
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
@@ -97,9 +98,22 @@
       window.location.href = "index.html";
     } catch (err) {
       alert(err.code);
-      console.error(err);
     }
   });
+
+  // ================= GOOGLE SIGN-IN =================
+  const provider = new GoogleAuthProvider();
+
+  window.googleSignIn = async function () {
+    try {
+      await signInWithPopup(auth, provider);
+      window.location.href = "index.html";
+    } catch (err) {
+      alert(err.code);
+      console.error(err);
+    }
+  };
 </script>
+
 </body>
 </html>
