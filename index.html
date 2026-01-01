@@ -61,7 +61,11 @@
   <button id="add-habit-btn">+ Add Habit</button>
 </div>
 
+  <div class="table-wrapper">
   <div id="table-container" aria-live="polite"></div>
+</div>
+<p class="swipe-hint">← Swipe to see all days →</p>
+
 
   <!-- MONTHLY PROGRESS GRAPH -->
   <div class="progress-section">
@@ -120,6 +124,27 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="script.js" type="module" defer></script>
 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-target="home">
+    <span class="icon">🏠</span>
+    <span class="label">Home</span>
+  </button>
+
+  <button class="nav-item" data-target="progress">
+    <span class="icon">📈</span>
+    <span class="label">Progress</span>
+  </button>
+
+  <button class="nav-item add" id="navAddHabit">
+    <span class="icon">＋</span>
+  </button>
+
+  <button class="nav-item" data-target="profile">
+    <span class="icon">👤</span>
+    <span class="label">Profile</span>
+  </button>
+</nav>
 
 </body>
 </html>

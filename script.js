@@ -695,3 +695,39 @@ async function deleteHabitFirestore(firestoreId) {
 
   await deleteDoc(doc(db, "habits", firestoreId));
 }
+/* ================================
+   MOBILE BOTTOM NAV LOGIC
+================================ */
+
+const navItems = document.querySelectorAll(".nav-item");
+
+navItems.forEach(item => {
+  item.addEventListener("click", () => {
+
+    navItems.forEach(i => i.classList.remove("active"));
+    item.classList.add("active");
+
+    const target = item.dataset.target;
+
+    if (target === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    if (target === "progress") {
+      document
+        .querySelector(".progress-section")
+        ?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    if (target === "profile") {
+      document
+        .getElementById("profileBtn")
+        ?.click();
+    }
+  });
+});
+
+/* Add Habit shortcut */
+document.getElementById("navAddHabit")?.addEventListener("click", () => {
+  document.getElementById("add-habit-btn")?.click();
+});
