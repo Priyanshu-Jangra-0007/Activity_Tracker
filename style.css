@@ -422,6 +422,7 @@ input[type="checkbox"] {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0; 
+  line-height: 1.3;
 }
 
 /* Action buttons */
@@ -740,4 +741,56 @@ tr:hover .habit-btn {
 
 .nav-item.add .icon {
   font-size: 26px;
+}
+
+.profile-link {
+    text-decoration: none !important;
+}
+.label{
+  color: #Dcfff0b3;
+}
+.profile-link:hover,
+.profile-link:visited,
+.profile-link:active {
+    text-decoration: none !important;
+}
+
+.profile-text {
+    color: #Dcfff0b3;
+    border-bottom: none !important;
+}
+
+.profile-text::after,
+.profile-text::before {
+    content: none !important;
+}
+
+
+@media (max-width: 768px) {
+  .habit-name {
+    white-space: normal;      /* allow multi-line */
+    overflow: visible;        /* show full text */
+    text-overflow: unset;     /* remove ellipsis */
+    word-break: break-word;  /* prevent overflow */
+  }
+}
+@media (max-width: 768px) {
+
+  /* Habit column must be wide enough */
+  th:first-child,
+  td:first-child {
+    min-width: 200px;   /* 🔑 key fix */
+    max-width: 200px;
+  }
+
+  /* Habit name text fix */
+  .habit-name {
+    white-space: normal;        /* allow wrapping */
+    word-break: keep-all;      /* ⛔ stop letter-by-letter breaks */
+    overflow-wrap: normal;     /* wrap only at spaces */
+    hyphens: none;
+
+    line-height: 1.4;
+    min-width: 180px;          /* safety */
+  }
 }
