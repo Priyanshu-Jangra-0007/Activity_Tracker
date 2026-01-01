@@ -794,3 +794,33 @@ tr:hover .habit-btn {
     min-width: 180px;          /* safety */
   }
 }
+/* ================================
+   MOBILE FIX: Edit/Delete overlap
+================================ */
+@media (max-width: 600px) {
+
+  .habit-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .habit-name {
+    font-size: 14px;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .habit-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .habit-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+}
