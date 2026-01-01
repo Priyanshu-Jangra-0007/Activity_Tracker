@@ -27,13 +27,24 @@
             <form id="loginForm">
                 <div class="form-group">
   <label>Email</label>
-  <input type="email" placeholder="your.email@example.com" required>
+  <input
+    type="email"
+    id="loginEmail"
+    placeholder="your.email@example.com"
+    required
+  >
 </div>
 
 <div class="form-group">
   <label>Password</label>
-  <input type="password" placeholder="Enter your password" required>
+  <input
+    type="password"
+    id="loginPassword"
+    placeholder="Enter your password"
+    required
+  >
 </div>
+
 
 
                 <div class="checkbox-group">
@@ -63,13 +74,20 @@
         </div>
     </div>
 
-    <script type="module">
+    </body>
+
+<script type="module">
   import { auth } from "./firebase.js";
   import { signInWithEmailAndPassword }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  const form = document.getElementById("loginForm");
+
+  console.log("Login script loaded");
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    console.log("Login submitted");
 
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
@@ -78,10 +96,10 @@
       await signInWithEmailAndPassword(auth, email, password);
       window.location.href = "index.html";
     } catch (err) {
-      alert("Invalid email or password");
+      alert(err.code);
+      console.error(err);
     }
   });
 </script>
-
 </body>
 </html>
