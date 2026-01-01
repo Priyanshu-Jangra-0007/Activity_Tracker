@@ -70,28 +70,13 @@
         </div>
     </div>
     <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { auth } from "./firebase.js";
   import {
-    getAuth,
     createUserWithEmailAndPassword,
     GoogleAuthProvider,
     signInWithPopup
   } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  // ================= FIREBASE INIT =================
-  const firebaseConfig = {
-    apiKey: "AIzaSyCuk1-E7-RfE7coqA9hh4rAFpTNIlyTbV8",
-    authDomain: "activity-tracker-web-dc8bb.firebaseapp.com",
-    projectId: "activity-tracker-web-dc8bb",
-    storageBucket: "activity-tracker-web-dc8bb.firebasestorage.app",
-    messagingSenderId: "243753651024",
-    appId: "1:243753651024:web:3030467037a6c830b63a55"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // ================= EMAIL / PASSWORD SIGNUP =================
   const form = document.getElementById("signupForm");
   const inputs = form.querySelectorAll("input");
 
@@ -120,10 +105,10 @@
     }
   });
 
-  // ================= GOOGLE SIGN-IN =================
+  // Google Sign-In
   const provider = new GoogleAuthProvider();
 
-  window.googleSignIn = async function () {
+  window.googleSignIn = async () => {
     try {
       await signInWithPopup(auth, provider);
       window.location.href = "index.html";
