@@ -168,8 +168,13 @@ async function loadHabits() {
 
   syncFirestoreHabitsToUI(firestoreHabits);
 
-  loadSheet(); // re-render using updated meta
+  await loadSheet(); // re-render using updated meta - MUST AWAIT
 }
+const MONTHS_ORDER = [
+  "JANUARY", "FEBRUARY", "MARCH", "APRIL",
+  "MAY", "JUNE", "JULY", "AUGUST",
+  "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+];
 
 
 const API_URL =
@@ -191,15 +196,16 @@ loadSheet();
 /* ================================
    LOAD SHEET
 ================================ */
-function loadSheet() {
-  fetch(`${API_URL}?month=${MONTH}`)
-    .then(res => res.json())
-    .then(data => renderMonth(data))
-    .catch(err => {
-      console.error("LOAD ERROR:", err);
-      document.getElementById("table-container").innerText =
-        "Failed to load data";
-    });
+async function loadSheet() {
+  try {
+    const res = await fetch(`${API_URL}?month=${MONTH}`);
+    const data = await res.json();
+    renderMonth(data);
+  } catch (err) {
+    console.error("LOAD ERROR:", err);
+    document.getElementById("table-container").innerText =
+      "Failed to load data";
+  }
 }
 
 /* ================================
@@ -253,66 +259,143 @@ function isCurrentMonth(month) {
     new Date().toLocaleString("default", { month: "long" }).toUpperCase()
   );
 }
+function getDaysInMonth(monthName, year = new Date().getFullYear()) {
+  const MAP = {
+    JANUARY: 0, FEBRUARY: 1, MARCH: 2, APRIL: 3,
+    MAY: 4, JUNE: 5, JULY: 6, AUGUST: 7,
+    SEPTEMBER: 8, OCTOBER: 9, NOVEMBER: 10, DECEMBER: 11
+  };
+
+  const index = MAP[monthName];
+  return new Date(year, index + 1, 0).getDate();
+}
+
 
 /* ================================
    RENDER MONTH
 ================================ */
+
 function renderMonth(data) {
+  
   const container = document.getElementById("table-container");
   container.innerHTML = "";
 
   const table = document.createElement("table");
 
-  const monthIndex = data.findIndex(r => r && r[0] === MONTH);
-  if (monthIndex === -1) return;
+  console.log("Looking for month:", MONTH);
+  console.log("Data received:", data);
 
-  const headerIndex = data.findIndex(
+  let headerIndex = -1;
+  // 🔑 FIX: Determine correct HABIT header for selected month
+  const habitHeaders = data
+    .map((r, i) => (r && r[0] === "HABIT" ? i : -1))
+    .filter(i => i !== -1);
+
+  const monthPos = MONTHS_ORDER.indexOf(MONTH);
+
+  if (monthPos === -1 || !habitHeaders[monthPos]) {
+    container.innerHTML =
+      `<p style="color:#fff;padding:20px;">No data found for ${MONTH}</p>`;
+    return;
+  }
+
+  headerIndex = habitHeaders[monthPos];
+
+  console.log("Header index found:", headerIndex);
+
+// CASE 1: API returned ONLY the month block (new behavior)
+if (data[0] && data[0][0] === "HABIT") {
+  headerIndex = 0;
+}
+
+// CASE 2: API returned FULL SHEET (old behavior)
+else {
+  const monthIndex = data.findIndex(r =>
+    r &&
+    typeof r[0] === "string" &&
+    r[0].trim().toUpperCase() === MONTH
+  );
+
+  if (monthIndex === -1) {
+    container.innerHTML =
+      `<p style="color:#fff;padding:20px;">No data found for ${MONTH}</p>`;
+    return;
+  }
+
+  headerIndex = data.findIndex(
     (r, i) => i > monthIndex && r && r[0] === "HABIT"
   );
-  if (headerIndex === -1) return;
+}
+
+
+if (headerIndex === -1) {
+  container.innerHTML =
+    `<p style="color:#fff;padding:20px;">Invalid sheet format for ${MONTH}</p>`;
+  return;
+}
+
+  console.log("Header index found:", headerIndex);
+  
+  if (headerIndex === -1) {
+    container.innerHTML = `<p style="color: #fff; padding: 20px;">No HABIT header found for ${MONTH}. Please check your Google Sheet.</p>`;
+    return;
+  }
 
   cachedData = data;
   cachedHeaderIndex = headerIndex;
+  let habitMeta = loadHabitMeta(MONTH);
+
+// ALWAYS rebuild order fresh per month
+habitMeta.order = [];
+habitMeta.names = habitMeta.names || {};
+habitMeta.deleted = habitMeta.deleted || {};
+habitMeta.custom = habitMeta.custom || {};
+
+// Collect ONLY rows belonging to THIS month
+for (let r = headerIndex + 1; r < data.length; r++) {
+  if (!data[r] || !data[r][0]) break;
+  habitMeta.order.push(r);
+}
+
+saveHabitMeta(MONTH, habitMeta);
 
   const header = data[headerIndex];
   const dayCols = [];
 
   let countCol = -1;
 
-  header.forEach((cell, i) => {
-    if (Number.isInteger(cell)) dayCols.push(i);
-    if (cell === "COUNT") countCol = i;
-  });
+  const daysInMonth = getDaysInMonth(MONTH);
+
+header.forEach((cell, i) => {
+  const dayNumber = parseInt(cell, 10);
+
+  if (!isNaN(dayNumber) && dayNumber >= 1 && dayNumber <= daysInMonth) {
+    dayCols.push(i);
+  }
+
+  if (cell === "COUNT") countCol = i;
+});
+
 
   cachedDayCols = dayCols;
   cachedCountCol = countCol;
 
   loadLocalCache(MONTH);
-let habitMeta = loadHabitMeta(MONTH);
+/* HEADER */
+const trHead = document.createElement("tr");
 
-if (!habitMeta.order) {
-  habitMeta.order = [];
-  habitMeta.names = {};
-  habitMeta.deleted = {};
-  habitMeta.custom = {};
-
-  for (let r = cachedHeaderIndex + 1; r < cachedData.length; r++) {
-    if (!cachedData[r] || !cachedData[r][0]) break;
-    habitMeta.order.push(r);
-  }
-
-  saveHabitMeta(MONTH, habitMeta);
-}
+header.forEach((h, i) => {
+  const dayNumber = parseInt(h, 10);
+  if (!isNaN(dayNumber) && dayNumber > daysInMonth) return;
 
 
-  /* HEADER */
-  const trHead = document.createElement("tr");
-  header.forEach(h => {
-    const th = document.createElement("th");
-    th.textContent = h;
-    trHead.appendChild(th);
-  });
-  table.appendChild(trHead);
+  const th = document.createElement("th");
+  th.textContent = h;
+  trHead.appendChild(th);
+});
+
+table.appendChild(trHead);
+
 
   /* ROWS */
 for (const r of habitMeta.order) {
@@ -321,24 +404,23 @@ for (const r of habitMeta.order) {
   let row;
 
 if (habitMeta.custom?.[r]) {
-  row = [];
+  row = new Array(header.length).fill("");
 
-  // habit name
   row[0] = habitMeta.names[r];
 
-  // day checkboxes (default false)
   cachedDayCols.forEach(c => {
-    row[c] = getLocal(MONTH, r, c) ?? false;
+    row[c] = getLocal(MONTH, r, c) === true;
   });
 
-  // count column
   row[cachedCountCol] = 0;
-} else {
+}
+ else {
   row = data[r];
 }
 
 
-  if (!row || !row[0]) continue;
+  if (!row) continue;
+
 
 
   const tr = document.createElement("tr");
@@ -383,8 +465,13 @@ tr.ondragend = () => {
 };
 
 
-    row.forEach((cell, c) => {
-      const td = document.createElement("td");
+row.forEach((cell, c) => {
+  const dayNumber = parseInt(header[c], 10);
+  if (!isNaN(dayNumber) && dayNumber > daysInMonth) return;
+
+
+  const td = document.createElement("td");
+
 
 if (c === 0) {
   const wrapper = document.createElement("div");
@@ -519,7 +606,8 @@ for (const r of habitMeta.order) {
   if (habitMeta.deleted?.[r]) continue;
 
   const row = data[r];
-  if (!row || !row[0]) continue;
+  if (!row) continue;
+
 
 
     const habitName = habitMeta.custom?.[r]
@@ -627,11 +715,34 @@ function updateCell(row, col, value) {
 /* ================================
    CHANGE MONTH
 ================================ */
-function changeMonth(m) {
-  MONTH = m;
+async function changeMonth(m) {
+  console.log("changeMonth called with:", m);
+  
+  // Convert to uppercase to match sheet format
+  MONTH = m.toUpperCase();
+  console.log("MONTH set to:", MONTH);
+
+  // 1️⃣ Reset UI
+  document.getElementById("table-container").innerHTML = "";
+
+  // 2️⃣ Destroy chart safely
+  if (chartInstance) {
+    chartInstance.destroy();
+    chartInstance = null;
+  }
+
+  // 3️⃣ Clear local cache (VERY IMPORTANT)
   localStorageCache = {};
-  loadSheet();
+
+  // 4️⃣ Sync dropdown
+  const select = document.querySelector(".month-select select");
+  if (select) select.value = m;
+
+  // 5️⃣ 🔑 RELOAD FIRESTORE HABITS FOR THIS MONTH
+  await loadHabits();   // <-- MUST AWAIT
 }
+window.changeMonth = changeMonth;
+
 /* ================================
    UPDATE CHART DATA (SAFE & FAST)
 ================================ */
